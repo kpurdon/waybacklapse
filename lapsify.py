@@ -3,15 +3,17 @@ import os
 from subprocess import call
 
 
-START_YEAR = 2010
+START_YEAR = 2000
 STOP_YEAR = 2015
 LAPSE_LEVEL = 'yearly'
-SITE_URL = 'nsidc.org'
+LAPSE_SPEED = 50  # slow=200 medium=100 fast=50
+SITE_URL = 'google.com'
 
 IMAGE_OUTPUT_DIRECTORY = os.path.join('.', 'staging', 'images')
 WAYBACK_API_ENDPOINT = 'http://archive.org/wayback/available'
 
 if LAPSE_LEVEL == 'monthly':
+    call('mkdir -p {0}'.format(IMAGE_OUTPUT_DIRECTORY), shell=True)
     image_urls = {}
     for year in range(START_YEAR, STOP_YEAR + 1):
         for month in range(1, 12 + 1):
@@ -32,10 +34,11 @@ if LAPSE_LEVEL == 'monthly':
             cmd = 'curl http://localhost:3000/?url={0} > {1}'.format(image_url, output_fn)
             call(cmd, shell=True)
 
-    cmd = 'convert -delay 100 staging/images/*.png waybacklapse.gif'
+    cmd = 'convert -delay {0} staging/images/*.png waybacklapse.gif'.format(LAPSE_SPEED)
     call(cmd, shell=True)
 
 elif LAPSE_LEVEL == 'yearly':
+    call('mkdir -p {0}'.format(IMAGE_OUTPUT_DIRECTORY), shell=True)
     image_urls = {}
     for year in range(START_YEAR, STOP_YEAR + 1):
         timestamp = '{0}06'.format(year)
@@ -56,7 +59,7 @@ elif LAPSE_LEVEL == 'yearly':
             cmd = 'curl http://localhost:3000/?url={0} > {1}'.format(image_url, output_fn)
             call(cmd, shell=True)
 
-    cmd = 'convert -delay 100 staging/images/*.png waybacklapse.gif'
+    cmd = 'convert -delay {0} staging/images/*.png waybacklapse.gif'.format(LAPSE_SPEED)
     call(cmd, shell=True)
 
 

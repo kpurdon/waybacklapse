@@ -13,20 +13,27 @@ It'll be ugly, not well (if at all) tested until I decide this is viable.
 ```
 brew install imagemagick
 brew install phantomjs
-git clone https://github.com/fzaninotto/screenshot-as-a-service.git -t v1.1.0
-cd screenshot-as-a-service && npm install
-node app
+git clone https://github.com/fzaninotto/screenshot-as-a-service.git
+git checkout -t v1.1.0
+cd screenshot-as-a-service && npm install && node app
 ```
 
 ## download my thing
 ```
 git clone https://github.com/kpurdon/waybacklapse.git
 cd waybacklapse
-[EDIT lapsify.py for years, timescale, URL, ...]
-python lapsify.py
 ```
 
+## config it!
+just open it up. there is some options at the top!
+
+
 ## it does it's thing
+
+WARNING: RUN THIS FROM THE ROOT DIRECTORY (/waybacklapse) OR THINGS.
+```
+python lapsify.py
+```
 
 lapsify will get a bunch of images in staging/images/*
 
