@@ -3,65 +3,43 @@ import os
 from subprocess import call
 
 
-START_YEAR = 2000
+START_YEAR = 1998
 STOP_YEAR = 2015
 LAPSE_LEVEL = 'yearly'
-LAPSE_SPEED = 50  # slow=200 medium=100 fast=50
+LAPSE_SPEED = 75  # slow=200 medium=100 fast=50
 SITE_URL = 'google.com'
 
 IMAGE_OUTPUT_DIRECTORY = os.path.join('.', 'staging', 'images')
-WAYBACK_API_ENDPOINT = 'http://archive.org/wayback/available'
+WAYBACK_API_ENDPOINT = 'http://web.archive.org/cdx/search/cdx'
+WAYBACK_URL_ENDPOINT = 'http://web.archive.org/web'
 
-if LAPSE_LEVEL == 'monthly':
-    call('mkdir -p {0}'.format(IMAGE_OUTPUT_DIRECTORY), shell=True)
-    image_urls = {}
-    for year in range(START_YEAR, STOP_YEAR + 1):
-        for month in range(1, 12 + 1):
-            timestamp = '{0}{1:02d}15'.format(year, month)
+call('mkdir -p {0}'.format(IMAGE_OUTPUT_DIRECTORY), shell=True)
 
-            payload = {'url': SITE_URL, 'timestamp': timestamp}
-            response = requests.get(WAYBACK_API_ENDPOINT, params=payload)
-            result = response.json()
+collapse = {'yearly': 'timestamp:4', 'monthly': 'timestamp:6'}
 
-            if result['archived_snapshots']:
-                image_url = result['archived_snapshots']['closest']['url']
-                image_timestamp = result['archived_snapshots']['closest']['timestamp']
-                image_urls[image_timestamp] = image_url
+payload = {
+    'url': SITE_URL,
+    'output': 'json',
+    'fl': 'timestamp,original',
+    'from': START_YEAR,
+    'to': STOP_YEAR,
+    'collapse': collapse[LAPSE_LEVEL]
+}
 
-    for timestamp, image_url in image_urls.iteritems():
-        output_fn = os.path.join(IMAGE_OUTPUT_DIRECTORY, '{0}.png'.format(timestamp))
-        if not os.path.exists(output_fn):
-            cmd = 'curl http://localhost:3000/?url={0} > {1}'.format(image_url, output_fn)
-            call(cmd, shell=True)
+response = requests.get(WAYBACK_API_ENDPOINT, params=payload)
+result = response.json()
+result = result[1:]  # get rid of the field name list
 
-    cmd = 'convert -delay {0} staging/images/*.png waybacklapse.gif'.format(LAPSE_SPEED)
-    call(cmd, shell=True)
+for capture in result:
+    actual_url = '{wayback}/{timestamp}/{url}'.format(wayback=WAYBACK_URL_ENDPOINT,
+                                                      timestamp=capture[0],
+                                                      url=capture[1])
 
-elif LAPSE_LEVEL == 'yearly':
-    call('mkdir -p {0}'.format(IMAGE_OUTPUT_DIRECTORY), shell=True)
-    image_urls = {}
-    for year in range(START_YEAR, STOP_YEAR + 1):
-        timestamp = '{0}06'.format(year)
+    output_fn = os.path.join(IMAGE_OUTPUT_DIRECTORY, '{timestamp}.png'.format(timestamp=capture[0]))
+    if not os.path.exists(output_fn):
+        cmd = 'curl http://localhost:3000/?url={url} > {output_fn}'.format(url=actual_url,
+                                                                           output_fn=output_fn)
+        call(cmd, shell=True)
 
-        payload = {'url': SITE_URL, 'timestamp': timestamp}
-        response = requests.get(WAYBACK_API_ENDPOINT, params=payload)
-        result = response.json()
-
-        if result['archived_snapshots']:
-            image_url = result['archived_snapshots']['closest']['url']
-            image_timestamp = result['archived_snapshots']['closest']['timestamp']
-            image_urls[image_timestamp] = image_url
-
-    for timestamp, image_url in image_urls.iteritems():
-        output_fn = os.path.join(IMAGE_OUTPUT_DIRECTORY, '{0}.png'.format(timestamp))
-        print output_fn
-        if not os.path.exists(output_fn):
-            cmd = 'curl http://localhost:3000/?url={0} > {1}'.format(image_url, output_fn)
-            call(cmd, shell=True)
-
-    cmd = 'convert -delay {0} staging/images/*.png waybacklapse.gif'.format(LAPSE_SPEED)
-    call(cmd, shell=True)
-
-
-else:
-    raise Exception('LAPSE_LEVEL MUST BE ONE OF [yearly|monthly]')
+cmd = 'convert -delay {lapse_speed} staging/images/*.png waybacklapse.gif'.format(lapse_speed=LAPSE_SPEED)
+call(cmd, shell=True)
