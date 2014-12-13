@@ -1,48 +1,51 @@
 waybacklapse
 ==========
 
-An exploratory project to create a timelapse from the wayback machine internet achive.
+A quick python project which can be run from the command line and will generate a time-lapse of a given website using the WayBack Machine.
 
+# Installation
 
-It'll be ugly, not well (if at all) tested until I decide this is viable.
+This tool currently has dependencies on external projects and is only tested on a mac.
 
-# set-up
-
-## install stuff
+## Install Dependencies
 
 ```
 brew install imagemagick
 brew install phantomjs
 git clone https://github.com/fzaninotto/screenshot-as-a-service.git
+cd screenshot-as-a-service
 git checkout -t v1.1.0
-cd screenshot-as-a-service && npm install && node app
+npm install
 ```
 
-## download my thing
+## Install My Source
 ```
 git clone https://github.com/kpurdon/waybacklapse.git
 cd waybacklapse
+virtualenv .waybacklapse
+. .waybacklapse/bin/activate
+pip install click requests
 ```
 
-## config it!
-just open it up. there is some options at the top!
+# Running The Tool
 
+## Start the screenshot-as-a-service node app
 
-## it does it's thing
-
-WARNING: RUN THIS FROM THE ROOT DIRECTORY (/waybacklapse) OR THINGS.
 ```
-python lapsify.py
+cd screenshot-as-a-service && node app
 ```
 
-lapsify will get a bunch of images in staging/images/*
+## Run waybacklapse.py
 
-and!!!! it will create waybacklapse.gif in the root.
+### Example:
 
-## beware
+The following will generate a GIF of google.com from 2000-2004 at a yearly interval at a medium lapse speed. The screenshot images will be stored in ./output/{currentdatetime}/ and the GIF will be in ./ouput/{currentdatetime}/timelapse/{somefn}.gif
 
-there is no cleanup. do this
+TODO: More documentation on command options.
+TODO: Defaults on the command options. (None for now)
+
 ```
-rm -rf staging/images/*
-rm waybacklapse.gif
+cd waybacklapse
+. .waybacklapse/bin/activate
+python waybacklapse.py google.com 2000 2004 output/ 75 yearly
 ```
