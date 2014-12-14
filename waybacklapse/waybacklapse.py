@@ -116,7 +116,7 @@ def convert_images(output_dir, url, timelapse_speed):
               callback=create_output_dir)
 @click.option('--start_year', prompt='What year would you like your timelapse to begin')
 @click.option('--stop_year', prompt='What year would you like your timelapse to end')
-@click.option('--speed', prompt='What speed would you like your timelapse (25=slow|100=fast)')
+@click.option('--speed', prompt='What speed would you like your timelapse (100=slow|25=fast)')
 @click.option('--level', prompt='Would you like a (1) yearly or (2) monthly timelapse',
               type=click.Choice(['1', '2']), callback=map_output_level)
 def main(url, start_year, stop_year, output_dir, speed, level):
