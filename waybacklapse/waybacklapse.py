@@ -1,9 +1,9 @@
 import os
 import sys
-import requests
 from subprocess import call
 import datetime as dt
 
+import requests
 import click
 
 

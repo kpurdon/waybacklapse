@@ -13,7 +13,8 @@ classifiers = [
 
 setuptools_kwargs = {
     'install_requires': [
-        'click>=3.3,<4'
+        'click>=3.3,<4',
+        'requests>=2.5.0,<3'
     ],
     'setup_requires': [
         'wheel>=0.24.0,<1',
