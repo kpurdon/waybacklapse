@@ -1,11 +1,11 @@
 waybacklapse
 ==========
 
-A quick python project which can be run from the command line and will generate a time-lapse of a given website using the WayBack Machine.
+A tool for creating a timelapse from the Wayback Machine.
 
 # Installation
 
-This tool currently has dependencies on external projects and is only tested on a mac.
+This tool currently has dependencies on external projects and is only tested on MacOS X.
 
 ## Install Dependencies
 
@@ -18,13 +18,16 @@ git checkout -t v1.1.0
 npm install
 ```
 
-## Install My Source
+## Install WAYBACKLAPSE (From PyPi)
+```
+pip install waybacklapse
+```
+
+## Install WAYBACKLAPSE (From Source)
 ```
 git clone https://github.com/kpurdon/waybacklapse.git
 cd waybacklapse
-virtualenv .waybacklapse
-. .waybacklapse/bin/activate
-pip install click requests
+python setup.py install
 ```
 
 # Running The Tool
@@ -35,17 +38,11 @@ pip install click requests
 cd screenshot-as-a-service && node app
 ```
 
-## Run waybacklapse.py
+## Run waybacklapse
 
-### Example:
-
-The following will generate a GIF of google.com from 2000-2004 at a yearly interval at a medium lapse speed. The screenshot images will be stored in ./output/{currentdatetime}/ and the GIF will be in ./ouput/{currentdatetime}/timelapse/{somefn}.gif
-
-TODO: More documentation on command options.
-TODO: Defaults on the command options. (None for now)
-
+For help:
 ```
-cd waybacklapse
-. .waybacklapse/bin/activate
-python waybacklapse.py google.com 2000 2004 output/ 75 yearly
+waybacklapse --help
 ```
+
+To run simply enter ```waybacklapse``` at the command line and follow the prompts.

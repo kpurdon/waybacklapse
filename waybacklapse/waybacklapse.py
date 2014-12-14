@@ -55,12 +55,18 @@ def construct_capture_urls(captures):
     return capture_urls
 
 
-def create_output_dir(output_dir):
+def create_output_dir(ctx, param, output_dir):
     output_dir_sub = os.path.join(output_dir, dt.datetime.now().strftime('%Y%m%d%H%m%s'))
     if not os.path.exists(os.path.join(output_dir_sub, 'timelapse')):
         os.makedirs(os.path.join(output_dir_sub, 'timelapse'))
 
     return output_dir_sub
+
+
+def map_output_level(ctx, param, output_level):
+    output_level_map = {'1': 'yearly', '2': 'monthly'}
+
+    return output_level_map[output_level]
 
 
 def get_images(output_dir, capture_urls, url):
@@ -105,25 +111,24 @@ def convert_images(output_dir, url, timelapse_speed):
 
 
 @click.command()
-@click.argument('url')
-@click.argument('start_year')
-@click.argument('stop_year')
-@click.argument('output_dir')
-@click.argument('timelapse_speed')
-@click.argument('timelapse_level')
-def waybacklapse(url, start_year, stop_year,
-                 output_dir, timelapse_speed,
-                 timelapse_level):
+@click.option('--url', prompt='What URL would you like to create a timelapse of (ex. google.com)')
+@click.option('--output_dir', prompt='What directory would you like the output in',
+              callback=create_output_dir)
+@click.option('--start_year', prompt='What year would you like your timelapse to begin')
+@click.option('--stop_year', prompt='What year would you like your timelapse to end')
+@click.option('--speed', prompt='What speed would you like your timelapse (25=slow|100=fast)')
+@click.option('--level', prompt='Would you like a (1) yearly or (2) monthly timelapse',
+              type=click.Choice(['1', '2']), callback=map_output_level)
+def main(url, start_year, stop_year, output_dir, speed, level):
 
-    payload = create_payload(url, start_year, stop_year,
-                             timelapse_level)
+    payload = create_payload(url, start_year, stop_year, level)
     captures = get_captures_list(payload)
     capture_urls = construct_capture_urls(captures)
 
-    output_dir = create_output_dir(output_dir)
+    # output_dir = create_output_dir(output_dir)
     get_images(output_dir, capture_urls, url)
-    convert_images(output_dir, url, timelapse_speed)
+    convert_images(output_dir, url, int(speed))
 
 
 if __name__ == '__main__':
-    waybacklapse()
+    main()
