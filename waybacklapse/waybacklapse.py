@@ -75,7 +75,7 @@ def get_images(output_dir, capture_urls, url):
         for timestamp, capture_url in capture_urls:
 
             output_fn = os.path.join(output_dir,
-                                     '{url}_{timestamp}.png'.format(url=url, timestamp=timestamp))
+                                     '{timestamp}.png'.format(timestamp=timestamp))
 
             print 'Capturing {url} ...'.format(url=capture_url)
 
@@ -94,8 +94,11 @@ def convert_images(output_dir, url, timelapse_speed):
 
     try:
         image_search_string = os.path.join(output_dir, '*.png')
+
+        keepcharacters = ('.', '_')
+        safe_fn = "".join(c for c in url if c.isalnum() or c in keepcharacters).rstrip()
         output_fn = os.path.join(output_dir, 'timelapse',
-                                 '{url}.gif'.format(url=url))
+                                 '{fn}.gif'.format(fn=safe_fn))
 
         # imagemagick must be installed!
         cmd = 'convert -delay {speed} {images} {gif}'
