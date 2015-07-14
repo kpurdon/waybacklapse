@@ -10,17 +10,14 @@ from wayback import Wayback
 TMP_OUTPUT_DIR = '/images'
 GIF_OUTPUT_DIR = '/output'
 RASTERIZE_SCRIPT = os.environ['rasterize']
-WIDTH = 1024
-RATIO = 4 / 3
-HEIGHT = int(WIDTH / RATIO)
 
 
 def capture_url(item):
 
     output_fn = os.path.join('/images', '{0}.png'.format(item[0]))
     print('Attemting to download: {0}'.format(item[1]))
-    cmd = 'phantomjs {rast} "{url}" {out} "{w}px*{h}px"'
-    cmd = cmd.format(rast=RASTERIZE_SCRIPT, url=item[1], out=output_fn, w=WIDTH, h=HEIGHT)
+    cmd = 'phantomjs {rast} "{url}" {out}'
+    cmd = cmd.format(rast=RASTERIZE_SCRIPT, url=item[1], out=output_fn)
     call(cmd, shell=True)
 
 
