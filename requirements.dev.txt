@@ -1,0 +1,4 @@
+rednose
+flake8
+nose
+httpretty
