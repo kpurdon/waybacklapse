@@ -1,9 +1,12 @@
 import os
+import time
 from multiprocessing import Pool
+from itertools import repeat
 from subprocess import call
 from datetime import datetime as dt
 
 import click
+from selenium import webdriver
 
 import wayback
 
@@ -12,12 +15,22 @@ TMP_OUTPUT_DIR = '/images'
 GIF_OUTPUT_DIR = '/output'
 
 
-def capture_url(item):
+def capture_url(item, width, height):
+
+    if not os.path.exists(TMP_OUTPUT_DIR):
+        os.mkdir(TMP_OUTPUT_DIR)
+
     output_fn = os.path.join('/images', '{0}.png'.format(item[0]))
     print('Attemting to download: {0}'.format(item[1]))
-    cmd = 'phantomjs {rast} "{url}" {out}'
-    cmd = cmd.format(rast=os.environ['rasterize'], url=item[1], out=output_fn)
-    call(cmd, shell=True)
+
+    driver = webdriver.PhantomJS()
+    try:
+        driver.set_window_size(width, height)
+        driver.get(item[1])
+        driver.get_screenshot_as_file(output_fn)
+        call('mogrify -crop {0}x{1}+0+0 {2}'.format(width, height, output_fn), shell=True)
+    finally:
+        driver.quit()
 
 
 def create_output_fn(url):
@@ -40,8 +53,12 @@ def create_output_fn(url):
               prompt='What speed would you like your timelapse (100=slow|25=fast)')
 @click.option('-l', '--limit', default=100,
               prompt='What is the max number of images you want')
+@click.option('-w', '--width', default=1280,
+              prompt='What output width (in px) do you want')
+@click.option('-h', '--height', default=720,
+              prompt='What output height (in px) do you want')
 @click.option('-v', '--verbose', is_flag=True)
-def cli(url, beginning, end, collapse, speed, limit, verbose):
+def cli(url, beginning, end, collapse, speed, limit, width, height, verbose):
     """
     Generate a GIF of a given website over a given time range.
     """
@@ -50,15 +67,18 @@ def cli(url, beginning, end, collapse, speed, limit, verbose):
 
     # not sure how to correctly set this, trial and error...
     with Pool(processes=12) as pool:
-        pool.map(capture_url, items)
+        pool.starmap(capture_url, zip(items, repeat(width), repeat(height)))
 
     output_fn = create_output_fn(url)
 
     cmd = 'convert'
+    cmd += ' -delay {0}'.format(speed)
+    cmd += ' {0}'.format(os.path.join(TMP_OUTPUT_DIR, '*.png'))
     if verbose:
         cmd += ' -verbose'
-    cmd += ' -delay {speed} {images} {gif}'
-    cmd = cmd.format(speed=speed, images=os.path.join(TMP_OUTPUT_DIR, '*.png'), gif=output_fn)
+    cmd += ' -background "rgb(255,255,255)"'
+    cmd += ' -alpha Remove'
+    cmd += ' {0}'.format(output_fn)
     print(cmd)
     call(cmd, shell=True)
 

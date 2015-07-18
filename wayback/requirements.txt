@@ -1,2 +1,3 @@
+selenium==2.46.0
 requests==2.7.0
 click==4.0
