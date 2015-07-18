@@ -1,6 +1,12 @@
 # waybacklapse
 
-This is a rewrite of the original waybacklapse using docker and phantomjs directly. It eliminates the need for the screenshot-as-a-service node application.
+This is a rewrite of the original waybacklapse using docker and phantomjs directly. It eliminates the need for the screenshot-as-a-service node application. You can still get the original version from pip and can checkout the source using the following command:
+
+* `git clone -b v1.0.1 git@github.com:kpurdon/waybacklapse.git`
+
+You can view the original README [here](https://github.com/kpurdon/waybacklapse/tree/v1.0.1).
+
+A blog post detailing the changes is [coming soon!]().
 
 ## Getting Started
 
