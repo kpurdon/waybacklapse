@@ -11,14 +11,29 @@ def up():
     run('docker-compose up')
 
 
-@task(pre=[build, up])
+@task(pre=[up])
 def help():
     run('docker-compose run wayback python3 /usr/src/app/waybacklapse.py --help')
 
 
 @task(default=True, pre=[build, up])
 def default():
-    run('docker-compose run wayback python3 /usr/src/app/waybacklapse.py -v -l 2')
+    cmd = 'docker-compose run wayback python3 /usr/src/app/waybacklapse.py'
+    cmd += ' -u google.com'
+    cmd += ' -b 1996'
+    cmd += ' -e 2015'
+    cmd += ' -c 4'
+    cmd += ' -s 50'
+    cmd += ' -l 2'
+    cmd += ' -w 1280'
+    cmd += ' -h 720'
+    cmd += ' -v'
+    run(cmd)
+
+
+@task(pre=[build, up])
+def runner():
+    run('docker-compose run wayback python3 /usr/src/app/waybacklapse.py')
 
 
 @task
