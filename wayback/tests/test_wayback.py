@@ -1,15 +1,16 @@
 import unittest
 import httpretty
 
-import wayback.wayback as wb
+import wayback.wayback as wayback
 
 
 class TestWayback(unittest.TestCase):
 
     def setUp(self):
-        self.wb = wb.Wayback('foo', '1996', '2015', 4)
+        self.wb = wayback.Wayback('foo', 2, '1996', '2015', 4)
         self.payload = {
             'url': 'foo',
+            'limit': 2,
             'output': 'json',
             'fl': 'timestamp,original',
             'from': '1996',

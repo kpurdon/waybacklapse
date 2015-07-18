@@ -5,19 +5,18 @@ from datetime import datetime as dt
 
 import click
 
-from wayback import Wayback
+import wayback
 
 
 TMP_OUTPUT_DIR = '/images'
 GIF_OUTPUT_DIR = '/output'
-RASTERIZE_SCRIPT = os.environ['rasterize']
 
 
 def capture_url(item):
     output_fn = os.path.join('/images', '{0}.png'.format(item[0]))
     print('Attemting to download: {0}'.format(item[1]))
     cmd = 'phantomjs {rast} "{url}" {out}'
-    cmd = cmd.format(rast=RASTERIZE_SCRIPT, url=item[1], out=output_fn)
+    cmd = cmd.format(rast=os.environ['rasterize'], url=item[1], out=output_fn)
     call(cmd, shell=True)
 
 
@@ -47,8 +46,7 @@ def cli(url, beginning, end, collapse, speed, limit, verbose):
     Generate a GIF of a given website over a given time range.
     """
 
-    items = Wayback(url, beginning, end, collapse).search()
-    items = items[:limit]
+    items = wayback.Wayback(url, limit, beginning, end, collapse).search()
 
     # not sure how to correctly set this, trial and error...
     with Pool(processes=12) as pool:

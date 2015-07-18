@@ -4,12 +4,17 @@ import requests
 
 class Wayback:
 
+    """
+    A helper class for searching the Wayback Lapse CDX API.
+    """
+
     search_api = 'http://web.archive.org/cdx/search/cdx'
     images_api = 'http://web.archive.org/web'
     url_format = '{wayback}/{timestamp}/{url}'
 
-    def __init__(self, url, start_year, stop_year, collapse=4):
+    def __init__(self, url, limit, start_year, stop_year, collapse=4):
         self.url = url
+        self.limit = limit
         self.start_year = start_year
         self.stop_year = stop_year
         self.collapse = collapse
@@ -20,6 +25,7 @@ class Wayback:
 
         payload = {
             'url': self.url,
+            'limit': self.limit,
             'output': 'json',
             'fl': 'timestamp,original',
             'from': self.start_year,
