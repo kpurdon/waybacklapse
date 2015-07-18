@@ -1,48 +1,17 @@
-waybacklapse
-==========
+# waybacklapse
 
-A tool for creating a timelapse from the Wayback Machine.
+This is a rewrite of the original waybacklapse using docker and phantomjs directly. It eliminates the need for the screenshot-as-a-service node application.
 
-# Installation
+## Getting Started
 
-This tool currently has dependencies on external projects and is only tested on MacOS X.
+* Have [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) working.
+* Build the image: `docker-compose build`
 
-## Install Dependencies
+To generate a GIF in ./output run: `docker-compose run wayback python3 /usr/src/app/waybacklapse.py`. You will be prompted for inputs. If you want to specify these values (not answering prompts) you can use the flag options shown by `--help`.
 
-```
-brew install imagemagick
-brew install phantomjs
-git clone https://github.com/fzaninotto/screenshot-as-a-service.git
-cd screenshot-as-a-service
-git checkout -t v1.1.0
-npm install
-```
+## Developing
 
-## Install WAYBACKLAPSE (From PyPi)
-```
-pip install waybacklapse
-```
-
-## Install WAYBACKLAPSE (From Source)
-```
-git clone https://github.com/kpurdon/waybacklapse.git
-cd waybacklapse
-python setup.py install
-```
-
-# Running The Tool
-
-## Start the screenshot-as-a-service node app
-
-```
-cd screenshot-as-a-service && node app
-```
-
-## Run waybacklapse
-
-For help:
-```
-waybacklapse --help
-```
-
-To run simply enter ```waybacklapse``` at the command line and follow the prompts.
+* Create a virtualenv/conda-env and activate it
+* `pip install invoke`
+* `invoke test`
+* `invoke`

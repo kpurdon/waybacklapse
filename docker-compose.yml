@@ -1,0 +1,4 @@
+wayback:
+  build: ./wayback
+  volumes:
+    - ./output:/output
