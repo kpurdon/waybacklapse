@@ -1,5 +1,6 @@
 import os
 import time
+import contextlib
 from multiprocessing import Pool
 from itertools import repeat
 from subprocess import call
@@ -7,6 +8,7 @@ from datetime import datetime as dt
 
 import click
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 import wayback
 
@@ -15,22 +17,38 @@ TMP_OUTPUT_DIR = '/images'
 GIF_OUTPUT_DIR = '/output'
 
 
-def capture_url(item, width, height):
+class closing(contextlib.closing):
+
+    def __exit__(self, *exc_info):
+        self.thing.quit()
+
+
+def capture_url(item, width, height, allow_redirects):
 
     if not os.path.exists(TMP_OUTPUT_DIR):
         os.mkdir(TMP_OUTPUT_DIR)
 
     output_fn = os.path.join('/images', '{0}.png'.format(item[0]))
-    print('Attemting to download: {0}'.format(item[1]))
+    print('Attemting to capture: {0}'.format(item[1]))
 
-    driver = webdriver.PhantomJS()
-    try:
+    with closing(webdriver.PhantomJS()) as driver:
         driver.set_window_size(width, height)
         driver.get(item[1])
-        driver.get_screenshot_as_file(output_fn)
-        call('mogrify -crop {0}x{1}+0+0 {2}'.format(width, height, output_fn), shell=True)
-    finally:
-        driver.quit()
+        try:
+            redirect_link = driver.find_element_by_link_text('Impatient?')
+            redirected = True  # redirect was found (redirect if allowed)
+            if allow_redirects:
+                while True:  # continue until all redirects are resolved
+                    print('Redirected to: {0}'.format(redirect_link.get_attribute('href')))
+                    redirect_link.click()
+        except NoSuchElementException:
+            redirected = False  # no redirect was found
+        except StaleElementReferenceException:
+            redirected = True  # redirect resolved before the "impatient" link was clicked
+        finally:
+            if not redirected or allow_redirects:  # only capture redirect if redirects are allowed
+                driver.get_screenshot_as_file(output_fn)
+                call('mogrify -crop {0}x{1}+0+0 {2}'.format(width, height, output_fn), shell=True)
 
 
 def create_output_fn(url):
@@ -57,8 +75,10 @@ def create_output_fn(url):
               prompt='What output width (in px) do you want')
 @click.option('-h', '--height', default=720,
               prompt='What output height (in px) do you want')
-@click.option('-v', '--verbose', is_flag=True)
-def cli(url, beginning, end, collapse, speed, limit, width, height, verbose):
+@click.option('-v', '--verbose', is_flag=True, default=False, prompt='Do you want verbose output')
+@click.option('-a', '--allow_redirects', is_flag=True, default=False,
+              prompt='Do you want to allow redirects (experimental)')
+def cli(url, beginning, end, collapse, speed, limit, width, height, verbose, allow_redirects):
     """
     Generate a GIF of a given website over a given time range.
     """
@@ -67,7 +87,8 @@ def cli(url, beginning, end, collapse, speed, limit, width, height, verbose):
 
     # not sure how to correctly set this, trial and error...
     with Pool(processes=12) as pool:
-        pool.starmap(capture_url, zip(items, repeat(width), repeat(height)))
+        pool.starmap(capture_url, zip(items, repeat(width), repeat(height),
+                                      repeat(allow_redirects)))
 
     output_fn = create_output_fn(url)
 
