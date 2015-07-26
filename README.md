@@ -11,7 +11,18 @@ A blog post detailing the changes is [here](http://kylepurdon.com/blog/waybackla
 ## Getting Started
 
 * Have [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) working.
+
+### Quick Method
+
+Requires Python3 on your system.
+
+* `pip install invoke` or `conda install invoke`
+* `invoke runner` which will build/start the docker container and run the command-line application. Output will be generated in ./output.
+
+### Detailed Method
+
 * Build the image: `docker-compose build`
+* Start the container: `docker-compose up`
 
 To generate a GIF in ./output run: `docker-compose run wayback python3 /usr/src/app/waybacklapse.py`. You will be prompted for inputs. If you want to specify these values (not answering prompts) you can use the flag options shown by `--help`.
 
