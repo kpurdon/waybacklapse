@@ -25,10 +25,7 @@ class closing(contextlib.closing):
 
 def capture_url(item, width, height, allow_redirects):
 
-    if not os.path.exists(TMP_OUTPUT_DIR):
-        os.mkdir(TMP_OUTPUT_DIR)
-
-    output_fn = os.path.join('/images', '{0}.png'.format(item[0]))
+    output_fn = os.path.join(TMP_OUTPUT_DIR, '{0}.png'.format(item[0]))
     print('Attemting to capture: {0}'.format(item[1]))
 
     with closing(webdriver.PhantomJS()) as driver:
@@ -84,6 +81,9 @@ def cli(url, beginning, end, collapse, speed, limit, width, height, verbose, all
     """
 
     items = wayback.Wayback(url, limit, beginning, end, collapse).search()
+    
+    if not os.path.exists(TMP_OUTPUT_DIR):
+        os.mkdir(TMP_OUTPUT_DIR)
 
     # not sure how to correctly set this, trial and error...
     with Pool(processes=12) as pool:
