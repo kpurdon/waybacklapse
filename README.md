@@ -6,8 +6,6 @@ This is a rewrite of the original waybacklapse using docker and phantomjs direct
 
 You can view the original README [here](https://github.com/kpurdon/waybacklapse/tree/v1.0.1).
 
-A blog post detailing the changes is [here](http://kylepurdon.com/blog/waybacklapse-20-a-python-wayback-machine-time-lapse-creator-now-with-python3-and-docker.html).
-
 ## Getting Started
 
 * Have [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) working.
